@@ -85,8 +85,10 @@ class BuildCMakeExt(build_ext):
         os.makedirs(build_dir, exist_ok=True)
         os.makedirs(extension_dir, exist_ok=True)
 
-        self.announce(f"Cloning Blender source from {BLENDER_GIT_REPO_URL}...",
-                      level=3)
+        # py35 fix
+        #self.announce("Cloning Blender source from {BLENDER_GIT_REPO_URL}...",
+        #              level=3)
+        self.announce("Cloning Blender source from {}...".format(BLENDER_GIT_REPO_URL),level=3)
 
         try:
 
@@ -102,7 +104,9 @@ class BuildCMakeExt(build_ext):
             blender_git_repo.heads.master.checkout()
             blender_git_repo.remotes.origin.pull()
 
-        self.announce(f"Updating Blender git submodules...", level=3)
+        # py35 fix
+        #self.announce(f"Updating Blender git submodules...", level=3)
+        self.announce("Updating Blender git submodules...", level=3)
 
         blender_git_repo.git.submodule('update', '--init', '--recursive')
 
@@ -122,9 +126,11 @@ class BuildCMakeExt(build_ext):
             for version in [12, 14, 15]:
 
                 try:
-
+                    # py35 fix
+                    #winreg.OpenKey(winreg.HKEY_CLASSES_ROOT,
+                    #               f"VisualStudio.DTE.{version}.0")
                     winreg.OpenKey(winreg.HKEY_CLASSES_ROOT,
-                                   f"VisualStudio.DTE.{version}.0")
+                                   "VisualStudio.DTE.{}.0".format(version))
 
                 except:
 
@@ -138,27 +144,48 @@ class BuildCMakeExt(build_ext):
 
                 raise Exception("Windows users must have "
                                 "Visual Studio installed")
+            # py35 fix
+            #svn_lib = (f"win{'dows' if BITS == 32 else '64'}"
+            #           f"{'_vc12' if max(vs_versions) == 12 else '_vc14'}")
+            #svn_url = (f"https://svn.blender.org/svnroot/bf-blender/trunk/lib/"
+            #           f"{svn_lib}")
+            #svn_dir = os.path.join(blenderpy_dir, "lib", svn_lib)
+            #
+            #svn_lib = (f"win{'dows' if BITS == 32 else '64'}"
+            #           f"{'_vc12' if max(vs_versions) == 12 else '_vc14'}")
+            #svn_url = (f"https://svn.blender.org/svnroot/bf-blender/trunk/lib/"
+            #           f"{svn_lib}")
+            #svn_dir = os.path.join(blenderpy_dir, "lib", svn_lib)
 
-            svn_lib = (f"win{'dows' if BITS == 32 else '64'}"
-                       f"{'_vc12' if max(vs_versions) == 12 else '_vc14'}")
-            svn_url = (f"https://svn.blender.org/svnroot/bf-blender/trunk/lib/"
-                       f"{svn_lib}")
+            svn_lib = ("win{}".format('dows' if BITS == 32 else '64')
+                       "{}".format('_vc12' if max(vs_versions) == 12 else '_vc14'))
+            svn_url = ("https://svn.blender.org/svnroot/bf-blender/trunk/lib/"
+                       "{}".format(svn_lib))
             svn_dir = os.path.join(blenderpy_dir, "lib", svn_lib)
 
             os.makedirs(svn_dir, exist_ok=True)
 
-            self.announce(f"Checking out svn libs from {svn_url}...", level=3)
+            # py35 fix
+            #self.announce(f"Checking out svn libs from {svn_url}...", level=3)
+            self.announce("Checking out svn libs from {}...".format(svn_url), level=3)
 
             blender_svn_repo = svn.remote.RemoteClient(svn_url)
             blender_svn_repo.checkout(svn_dir)
 
         self.announce("Configuring cmake project...", level=3)
 
+        # py35 fix
+        #self.spawn(['cmake', '-H'+blender_dir, '-B'+self.build_temp,
+        #            '-DWITH_PLAYER=OFF', '-DWITH_PYTHON_INSTALL=OFF',
+        #            '-DWITH_PYTHON_MODULE=ON',
+        #            f"-DCMAKE_GENERATOR_PLATFORM=x"
+        #            f"{'86' if BITS == 32 else '64'}"])
+
         self.spawn(['cmake', '-H'+blender_dir, '-B'+self.build_temp,
                     '-DWITH_PLAYER=OFF', '-DWITH_PYTHON_INSTALL=OFF',
                     '-DWITH_PYTHON_MODULE=ON',
-                    f"-DCMAKE_GENERATOR_PLATFORM=x"
-                    f"{'86' if BITS == 32 else '64'}"])
+                    "-DCMAKE_GENERATOR_PLATFORM=x"
+                    "{}".format('86' if BITS == 32 else '64')])
         
         self.announce("Building binaries...", level=3)
 
