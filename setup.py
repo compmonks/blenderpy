@@ -3,6 +3,7 @@ Build blender into a python module
 
 Depends upon the bpybuild package
 """
+# pip install git+https://github.com/compmonks/blenderpy.git@py35
 
 import os
 import pathlib
@@ -157,8 +158,7 @@ class BuildCMakeExt(build_ext):
             #           f"{svn_lib}")
             #svn_dir = os.path.join(blenderpy_dir, "lib", svn_lib)
 
-            svn_lib = ("win{}".format('dows' if BITS == 32 else '64')
-                       "{}".format('_vc12' if max(vs_versions) == 12 else '_vc14'))
+            svn_lib = ("win{}{}".format('dows' if BITS == 32 else '64','_vc12' if max(vs_versions) == 12 else '_vc14'))
             svn_url = ("https://svn.blender.org/svnroot/bf-blender/trunk/lib/"
                        "{}".format(svn_lib))
             svn_dir = os.path.join(blenderpy_dir, "lib", svn_lib)
